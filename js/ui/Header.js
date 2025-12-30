@@ -1,4 +1,5 @@
 import Calendar from "../components/Calendar.js";
+import Constants from "../core/Constants.js";
 
 export default class Header {
   constructor(container) {
@@ -10,7 +11,7 @@ export default class Header {
       <div class="header">
 
         <div class="header-left">
-          <div class="header-logo">🐶</div>
+          <div class="header-logo">${Constants.APP_ICON}</div>
           <div class="header-title">
             <h1>Puppy Tracker</h1>
             <small>Puppy Life Diary</small>

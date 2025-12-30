@@ -7,8 +7,8 @@ const Config = {
 
   DEFAULT_PUPPY: {
     name: "Buddy",
-    birthday: "2024-10-01",
-    adoptionDate: "2024-11-15",
+    birthday: "2025-07-25",
+    adoptionDate: "2025-09-27",
   },
 
   EVENT_TYPES: ["pee", "poop", "eat"],
@@ -16,8 +16,10 @@ const Config = {
 
   CALENDAR_VISIBLE_DAYS: 5,
 
-  // ➕ добавлено
-  CALENDAR_FIRST_DAY: new Date("2025-09-27"),
+  /* ===== DERIVED CONFIG (single source of truth) ===== */
+  get CALENDAR_FIRST_DAY() {
+    return new Date(this.DEFAULT_PUPPY.adoptionDate);
+  },
 };
 
 export default Config;

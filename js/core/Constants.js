@@ -1,4 +1,6 @@
 const Constants = {
+  APP_ICON: "🐶",
+
   EVENT_TYPES: {
     PEE: "pee",
     POOP: "poop",

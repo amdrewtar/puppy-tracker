@@ -30,7 +30,7 @@
 }
 
 .header-logo {
-  font-size: 28px;
+  font-size: 40px;
 }
 
 .header-title h1 {
@@ -38,6 +38,7 @@
 }
 
 .header-title small {
+  margin-top: 2px;
   display: block;
 }
 
@@ -122,4 +123,24 @@
 
   display: grid;
   gap: 24px;
+}
+
+/* ================= MAIN LAYOUT ================= */
+
+.main-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+/* left column */
+.main-content {
+  display: grid;
+  gap: 16px;
+}
+
+/* right column */
+.sidebar {
+  display: grid;
+  gap: 16px;
 }
