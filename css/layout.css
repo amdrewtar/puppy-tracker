@@ -134,8 +134,15 @@
 }
 
 /* left column */
-.main-content {
+/* .main-content {
   display: grid;
+  gap: 16px;
+} */
+.main-content {
+  flex: 0 0 auto;
+  align-self: flex-start;
+  height: auto;
+  min-height: unset;
   gap: 16px;
 }
 
@@ -143,4 +150,7 @@
 .sidebar {
   display: grid;
   gap: 16px;
+}
+.main-content section {
+  margin-bottom: 24px;
 }

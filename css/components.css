@@ -1,9 +1,18 @@
 /* ================= BUTTONS ================= */
 
 button {
-  font-family: inherit;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Inter, Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
-
+input,
+textarea {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Inter, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  color: var(--gray-800);
+}
 /* ================= CALENDAR ================= */
 
 .calendar-nav {
@@ -49,19 +58,19 @@ button {
   color: #ffffff;
   box-shadow: var(--shadow-cal-tod);
   transform: scale(1.15);
-  border: 1px solid linear-gradient(135deg, var(--purple-500), var(--pink-500));
-  margin: 0px 5px;
+  margin: 0 5px;
 }
-
 .calendar-day.active small {
-  color: rgba(255, 255, 255, 0.9);
+  color: #ffffff;
 }
 .calendar-day.active strong {
   color: #ffffff;
 }
-
 .calendar-day.today {
   outline: 1px solid var(--purple-500);
+}
+.calendar-day.today.active {
+  outline: none;
 }
 
 .calendar-day.disabled {
@@ -76,42 +85,27 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-
   width: 28px;
   height: 28px;
-
   cursor: pointer;
   color: var(--gray-500);
-
   transition: var(--transition-fast);
+  border-radius: 50%;
 }
 
-.nav-btn svg {
-  width: 20px;
-  height: 20px;
-}
-
-/* hover только для активных */
 .nav-btn:not(:disabled):hover {
   color: var(--purple-600);
+  background: rgba(124, 58, 237, 0.12); /* фиолетовый hover */
   transform: scale(1.25);
 }
 
-/* disabled */
-.nav-btn:disabled {
-  color: var(--gray-200);
-  opacity: 0.9;
-  cursor: default;
-  transform: none;
-}
-/* test commit */
 /* ================= AGE CARD ================= */
 
 .card {
   background: #ffffff;
   border-radius: var(--radius-md);
   border: 1px solid var(--gray-200);
-  padding: 16px;
+  padding: 16px 20px;
   box-shadow: var(--shadow-sm);
 }
 
@@ -185,10 +179,370 @@ button {
 .add-event-btn:hover {
   transform: scale(1.03);
 }
+
 /* ================= REMINDERS ================= */
 
-.reminders-card p {
-  margin-top: 8px;
-  font-size: 13px;
+.reminders-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+/* ===== PLUS BUTTON (как modal close, но inline) ===== */
+
+.add-reminder-btn {
+  position: static; /* 🔥 ключевое */
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 600;
+  color: var(--purple-600);
+
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.add-reminder-btn:hover {
+  background: rgba(124, 58, 237, 0.12); /* фиолетовый hover */
+  transform: scale(1.15);
+}
+/* ================= REMINDER ITEM ================= */
+
+.reminder-item {
+  display: grid;
+  grid-template-columns: 48px 1fr; /* ~2 / 8 */
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--blue-200);
+  background: linear-gradient(135deg, var(--blue-100), var(--pink-100));
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  margin-bottom: 10px;
+  position: relative; /* 🔥 НУЖНО для крестика */
+}
+
+/* icon */
+
+.reminder-icon {
+  color: var(--purple-600);
+  font-size: 26px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 2px;
+  margin: auto;
+}
+.reminder-icon svg {
+  width: 30px;
+  height: 30px;
+}
+
+/* content */
+
+.reminder-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* title */
+
+.reminder-title strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+/* meta row */
+
+.reminder-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12.5px;
   color: var(--gray-500);
+}
+.reminder-meta svg {
+  width: 14px;
+  margin-right: 2px;
+}
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* note */
+
+.reminder-note {
+  font-size: 12.5px;
+  color: var(--gray-600);
+  display: flex;
+  gap: 6px;
+  line-height: 1.35;
+}
+
+/* animation (вход) */
+
+.reminder-item {
+  opacity: 0;
+  transform: translateX(-12px);
+  animation: reminder-in 0.35s ease forwards;
+}
+
+@keyframes reminder-in {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ================= DELETE BUTTON ================= */
+
+.reminder-delete {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+
+  border: none;
+  background: transparent;
+  color: var(--gray-500);
+  font-size: 12px;
+  line-height: 1;
+
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.reminder-delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  transform: scale(1.1);
+}
+
+/* ================= DELETE ANIMATION ================= */
+
+.reminder-item.removing {
+  animation: reminder-out 0.28s ease forwards;
+  border-color: #ef4444; /* красная рамка */
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.15),
+    rgba(239, 68, 68, 0.05)
+  );
+}
+@keyframes reminder-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(-18px); /* 👈 уходит ВЛЕВО */
+  }
+}
+
+/* ================= MODAL ================= */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-window {
+  width: 400px;
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+/* ===== MODAL HEADER ===== */
+
+.modal-header {
+  position: relative;
+  padding: 20px 24px 0;
+}
+
+.modal-header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-icon {
+  color: var(--purple-600);
+  font-size: 28px;
+}
+
+.modal-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* close (крестик в модалке) */
+
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  color: var(--gray-500);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.modal-close:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--gray-800);
+}
+
+/* ===== MODAL BODY ===== */
+
+.modal-body {
+  padding: 6px 24px 6px;
+}
+
+.modal-body h4 {
+  font-size: 12.5px;
+  font-weight: 400;
+  color: var(--gray-500);
+  margin: 14px 0 6px;
+}
+
+/* ===== INPUTS ===== */
+
+.input-group {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+}
+.input-icon svg {
+  width: 20px;
+  height: 20px;
+  color: var(--gray-500);
+  margin-right: 10px;
+}
+
+.input-group input,
+.input-group textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  text-align: left;
+  font-size: 14px;
+  color: var(--gray-800);
+}
+
+/* textarea auto-grow */
+
+.input-group textarea {
+  resize: none;
+  min-height: 36px;
+  max-height: 120px;
+  overflow-y: hidden;
+}
+
+.input-group textarea:focus {
+  overflow-y: auto;
+}
+
+/* ===== QUICK SELECT ===== */
+
+.quick-select {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.quick-select button {
+  flex: 1;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 7px 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.quick-select button.active {
+  border-color: var(--purple-500);
+  box-shadow: var(--shadow-sm);
+}
+.quick-select button:hover {
+  background: var(--gray-100);
+}
+
+/* ===== MODAL FOOTER ===== */
+
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  padding: 18px 22px 22px;
+}
+
+.btn-secondary,
+.btn-primary {
+  background: linear-gradient(135deg, var(--purple-500), var(--pink-500));
+  flex: 1;
+  padding: 12px;
+  font-size: 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.btn-secondary {
+  border: 1px solid var(--gray-200);
+  background: white;
+}
+
+.btn-secondary:hover {
+  background: var(--gray-100);
+}
+.btn-primary {
+  color: white;
+  background: linear-gradient(135deg, var(--purple-500), var(--pink-500));
+  flex: 1;
+  padding: 12px;
+  font-size: 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  border: none;
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary:not(:disabled):hover {
+  transform: scale(1.04);
 }

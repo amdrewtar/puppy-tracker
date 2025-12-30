@@ -25,10 +25,13 @@ body {
   /* Colors */
   --purple-500: #a855f7;
   --purple-600: #8023d6;
+  --pink-700: #faf5ff;
   --pink-100: #f9f3fa;
   --pink-500: #ec4899;
   --pink-600: #db2777;
 
+  --blue-100: #eef2ff;
+  --blue-200: #c9d4ff;
   --blue-500: #3b82f6;
   --amber-500: #f59e0b;
   --green-500: #10b981;
@@ -71,7 +74,6 @@ h2 {
 h3 {
   font-size: 16px;
   font-weight: 600;
-  color: var(--gray-500);
 }
 
 small {

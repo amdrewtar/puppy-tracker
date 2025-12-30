@@ -48,11 +48,36 @@ class State {
 
   /* ================= REMINDERS ================= */
 
-  getReminders() {
-    return this.reminders;
+  getFutureReminders() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const toDate = new Date(today);
+    toDate.setDate(today.getDate() + 3); // 👈 сегодня + 3 дня
+
+    return this.reminders.filter((r) => {
+      const d = new Date(r.date);
+      d.setHours(0, 0, 0, 0);
+
+      // ✅ сегодня → через 3 дня
+      return d >= today && d <= toDate;
+    });
   }
 
+  // ✅ ГЛАВНЫЙ ВХОД ИЗ БД
+  setReminders(reminders) {
+    console.log("🧠 State.setReminders()", reminders);
+
+    this.reminders = reminders;
+
+    // синхронизация (не источник!)
+    Storage.save(Config.STORAGE_KEYS.REMINDERS, reminders);
+  }
+
+  // ⚠️ оставляем, но не используем для БД
   addReminder(reminder) {
+    console.warn("⚠️ addReminder() deprecated — reminders are loaded from DB");
+
     this.reminders.push(reminder);
     Storage.save(Config.STORAGE_KEYS.REMINDERS, this.reminders);
   }
