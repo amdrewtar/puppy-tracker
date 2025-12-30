@@ -1,0 +1,125 @@
+/* ================= APP LAYOUT ================= */
+
+#app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #ffffff;
+  border-bottom: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
+  height: 100px;
+}
+
+.header {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 15px 20px;
+
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 20px;
+}
+
+/* ================= HEADER LEFT ================= */
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-logo {
+  font-size: 28px;
+}
+
+.header-title h1 {
+  line-height: 1.1;
+}
+
+.header-title small {
+  display: block;
+}
+
+/* ================= HEADER CENTER (CALENDAR PLACEHOLDER) ================= */
+
+.header-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.calendar-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 8px;
+  font-size: 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.calendar-btn:hover {
+  background: var(--gray-100);
+}
+
+.calendar-strip {
+  display: flex;
+  gap: 8px;
+  padding: 0 8px;
+}
+
+/* Calendar day placeholder */
+.calendar-day {
+  width: 52px;
+  padding: 6px 4px;
+  border-radius: var(--radius-sm);
+  text-align: center;
+  background: var(--gray-100);
+  cursor: default;
+}
+
+.calendar-day strong {
+  display: block;
+  font-size: 16px;
+}
+
+/* ================= HEADER RIGHT ================= */
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.stats-button {
+  border: none;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--purple-500), var(--pink-500));
+  color: #ffffff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.stats-button:hover {
+  transform: scale(1.03);
+}
+
+/* ================= MAIN CONTAINER ================= */
+
+#app-root {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px;
+
+  display: grid;
+  gap: 24px;
+}

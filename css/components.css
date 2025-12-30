@@ -1,0 +1,100 @@
+/* ================= BUTTONS ================= */
+
+button {
+  font-family: inherit;
+}
+
+/* ================= CALENDAR ================= */
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.calendar-strip {
+  display: flex;
+  gap: 8px;
+}
+
+.calendar-day {
+  width: 56px;
+  padding: 6px 4px;
+  border-radius: var(--radius-sm);
+  border: none;
+  box-shadow: var(--shadow-cal);
+  cursor: pointer;
+  text-align: center;
+  transition: var(--transition-fast);
+}
+
+.calendar-day small {
+  display: block;
+  font-size: 11px;
+  color: var(--gray-500);
+}
+
+.calendar-day strong {
+  font-size: 16px;
+}
+
+.calendar-day:hover {
+  background: var(--gray-200);
+}
+
+.calendar-day.active {
+  background: linear-gradient(135deg, var(--purple-500), var(--pink-500));
+  color: #ffffff;
+  box-shadow: var(--shadow-cal-tod);
+  transform: scale(1.15);
+  margin: 0px 5px;
+}
+
+.calendar-day.active small {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.calendar-day.today {
+  outline: 1px solid var(--purple-500);
+}
+
+.calendar-day.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ================= NAV BUTTONS ================= */
+
+.nav-btn {
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+
+  cursor: pointer;
+  color: var(--gray-500);
+
+  transition: var(--transition-fast);
+}
+
+.nav-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* hover только для активных */
+.nav-btn:not(:disabled):hover {
+  color: var(--purple-600);
+  transform: scale(1.15);
+}
+
+/* disabled */
+.nav-btn:disabled {
+  color: #111827;
+  opacity: 0.3;
+  cursor: default;
+  transform: none;
+}
