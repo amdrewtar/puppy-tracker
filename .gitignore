@@ -1,0 +1,26 @@
+# OpenServer
+/.osp/
+userdata/
+domains/
+
+# PHP
+/vendor/
+composer.lock
+
+# Env
+.env
+
+# Logs
+*.log
+
+# Cache / temp
+/tmp/
+.cache/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
