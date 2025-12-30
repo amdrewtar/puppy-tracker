@@ -1,1 +1,1 @@
-echo "<?php echo 'Hello Puppy Tracker!';" > public\index.php
+echo "<?php echo 'Hello Puppy ssssTracker!';" > public\index.php
