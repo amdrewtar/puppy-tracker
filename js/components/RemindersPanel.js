@@ -170,8 +170,8 @@ export default class RemindersPanel {
     return `
       <div class="reminder-item empty">
         <div class="reminder-icon">${Constants.ICONS.NONE}</div>
-        <div class="reminder-content">
-          <strong>Нет ближайших событий</strong>
+        <div class="reminder-content" style="margin: auto 10px; font-size: 15px;">
+          <span class="reminder-meta">Нет ближайших событий</span>
         </div>
       </div>
     `;

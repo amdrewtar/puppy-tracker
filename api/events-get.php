@@ -17,7 +17,6 @@ if (!isset($input["date"])) {
 $date = $input["date"];
 
 try {
-  // 🔧 ИЗМЕНЕНО: явный select нужных полей
   $stmt = $pdo->prepare("
     SELECT
       id,
@@ -25,6 +24,7 @@ try {
       event_date,
       event_time,
       location_type,
+      grams,
       comment
     FROM events
     WHERE event_date = :date
@@ -37,15 +37,19 @@ try {
 
   $events = $stmt->fetchAll();
 
-  // 🔥 ДОБАВЛЕНО: нормализация данных под фронт
+  // 🔥 НОРМАЛИЗАЦИЯ ДЛЯ ФРОНТА (FIX)
   $normalized = array_map(function ($row) {
     return [
-      "id" => $row["id"],
-      "type" => $row["event_type"],              // pee / poop / eat
-      "time" => substr($row["event_time"], 0, 5),// HH:MM
-      "location" => $row["location_type"],       // home / street
-      "comment" => $row["comment"],
-      "date" => $row["event_date"],
+      "id"       => $row["id"],
+      "type"     => $row["event_type"],                 // pee / poop / eat
+      "time"     => substr($row["event_time"], 0, 5),   // HH:MM
+      "date"     => $row["event_date"],
+      "comment"  => $row["comment"],
+      "grams"    => $row["grams"],                      // ✅ ВОТ ОНО
+      // ❗ location только если не eat
+      "location" => $row["event_type"] === "eat"
+        ? null
+        : $row["location_type"],
     ];
   }, $events);
 

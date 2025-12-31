@@ -329,7 +329,7 @@ textarea::placeholder {
   padding: 14px;
   border-radius: var(--radius-md);
   background: #fff;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-xs);
 }
 
 /* icon */
@@ -791,7 +791,7 @@ textarea::placeholder {
 
 .event-item.removing {
   animation: event-out 0.28s ease forwards;
-  border-left-color: #ef4444;
+  border-color: #ef4444;
   background: linear-gradient(
     135deg,
     rgba(239, 68, 68, 0.15),

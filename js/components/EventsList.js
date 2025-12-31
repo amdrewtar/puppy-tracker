@@ -58,12 +58,11 @@ export default class EventsList {
         data-id="${event.id}"
         style="
           background:${colors.bg};
-          border-left:1.7px solid ${colors.border};
+          border:1.5px solid ${colors.border};
           animation-delay:${index * 0.06}s;
         "
       >
 
-        <!-- ❌ DELETE -->
         <button
           class="event-delete"
           data-action="delete"
@@ -72,7 +71,6 @@ export default class EventsList {
           ✕
         </button>
 
-        <!-- ICON -->
         <div
           class="event-icon event-icon-main"
           style="
@@ -98,6 +96,19 @@ export default class EventsList {
                       ${Constants.EVENT_ICONS[event.location.toUpperCase()]}
                     </span>
                     <span>${event.location}</span>
+                  </span>
+                `
+                : ""
+            }
+
+            ${
+              event.type === "eat" && event.grams
+                ? `
+                  <span class="event-location">
+                    <span class="event-icon event-icon-meta">
+                      ${Constants.EVENT_ICONS.EAT}
+                    </span>
+                    <span>${event.grams} g</span>
                   </span>
                 `
                 : ""
@@ -147,8 +158,10 @@ export default class EventsList {
       const id = item.dataset.id;
       if (!id) return;
 
-      // 🔴 анимация удаления
       item.classList.add("removing");
+      item.style.background = "";
+      item.style.border = "";
+      item.style.borderLeft = "";
 
       try {
         await fetch("/api/events-delete.php", {
@@ -162,7 +175,6 @@ export default class EventsList {
         return;
       }
 
-      // 👉 после анимации
       setTimeout(() => {
         item.remove();
 
