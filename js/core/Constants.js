@@ -18,18 +18,38 @@ const Constants = {
     PEE: "pee",
     POOP: "poop",
     EAT: "eat",
+    HOME: "home",
+    STREET: "street",
   },
 
   EVENT_ICONS: {
-    pee: "💧",
+    pee: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-droplet w-6 h-6 mx-auto mb-1 text-blue-500" data-fg-dvrp18="1.30:1.7488:/src/app/components/AddEventModal.tsx:80:19:2796:105:e:Droplet::::::ChjX"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"></path></svg>',
     poop: "💩",
-    eat: "🍴",
+    eat: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-utensils-crossed w-6 h-6 mx-auto mb-1 text-gray-400" data-fg-dvrp27="1.30:1.7488:/src/app/components/AddEventModal.tsx:102:19:3930:114:e:UtensilsCrossed::::::Cm7h"><path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8"></path><path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c.7.7 2 .7 2.8 0L15 15Zm0 0 7 7"></path><path d="m2.1 21.8 6.4-6.3"></path><path d="m19 5-7 7"></path></svg>',
+    HOME: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house w-6 h-6 mx-auto mb-1 text-purple-500" data-fg-dvrp42="1.30:1.7488:/src/app/components/AddEventModal.tsx:132:21:5266:106:e:House::::::pfz"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>',
+    STREET:
+      '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin w-6 h-6 mx-auto mb-1 text-gray-400" data-fg-dvrp46="1.30:1.7488:/src/app/components/AddEventModal.tsx:143:21:5865:108:e:MapPin::::::EHMc"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"></path><circle cx="12" cy="10" r="3"></circle></svg>',
   },
 
   EVENT_COLORS: {
-    pee: "#3b82f6",
-    poop: "#f59e0b",
-    eat: "#10b981",
+    pee: {
+      border: "#bedbff",
+      bg: "#e5f0ff",
+      title: "#193cb8",
+      text: "#5288fc",
+    },
+    eat: {
+      border: "#b9f8cf",
+      bg: "#edfdf2",
+      title: "#016630",
+      text: "#51aa75",
+    },
+    poop: {
+      border: "#feea9d",
+      bg: "#fff7d9",
+      title: "#973c00",
+      text: "#e78f32",
+    },
   },
 
   CALENDAR: {

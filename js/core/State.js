@@ -46,6 +46,11 @@ class State {
     Storage.save(Config.STORAGE_KEYS.EVENTS, this.events);
   }
 
+  setEvents(events) {
+    console.log("🧠 State.setEvents()", events);
+    this.events = events;
+  }
+
   /* ================= REMINDERS ================= */
 
   getFutureReminders() {

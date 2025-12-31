@@ -1,8 +1,9 @@
 import AgeCard from "../components/AgeCard.js";
 import EventsList from "../components/EventsList.js";
 import AddEventModal from "../components/AddEventModal.js";
-import RemindersPanel from "../components/RemindersPanel.js"; // ➕ добавлено
+import RemindersPanel from "../components/RemindersPanel.js";
 import AddReminderModal from "../components/AddReminderModal.js";
+import Constants from "../core/Constants.js";
 
 export default class Main {
   constructor(root) {
@@ -16,17 +17,31 @@ export default class Main {
         <!-- LEFT: main content (2/3) -->
         <div class="main-content">
           <section id="age-card"></section>
+
+          <!-- ADD NEW EVENT CARD -->
           <section>
-            <button class="add-event-btn" id="add-event-btn">
-                + Add New Event
-            </button>
+            <div
+              class="add-event-card"
+              id="add-event-btn"
+              role="button"
+              tabindex="0"
+            >
+              <div class="add-event-inner">
+                <span class="add-event-icon">
+                  ${Constants.ICONS.PLUS}
+                </span>
+                <span class="add-event-text">
+                  Add New Event
+                </span>
+              </div>
+            </div>
           </section>
+
           <section id="events-list"></section>
         </div>
 
         <!-- RIGHT: reminders (1/3) -->
         <aside class="sidebar">
-          <!-- сюда монтируем RemindersPanel -->
           <div id="reminders-root"></div>
         </aside>
 
@@ -44,6 +59,8 @@ export default class Main {
     this.ageCard.render();
     this.eventsList.render();
     this.reminders.render();
+
+    // ===== ADD EVENT =====
 
     document.getElementById("add-event-btn").onclick = () => {
       new AddEventModal(() => this.eventsList.render()).open();

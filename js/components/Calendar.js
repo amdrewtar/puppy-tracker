@@ -148,14 +148,28 @@ export default class Calendar {
       const btn = e.target.closest("button");
       if (!btn || btn.disabled) return;
 
+      // 👉 Клик по конкретному дню
       if (btn.dataset.date) {
         const date = new Date(btn.dataset.date);
         state.setSelectedDate(date);
-        console.log("Selected date:", date);
+
+        console.log("📅 Выбран день в календаре:", state.getSelectedDate());
+
+        // 🔔 сообщаем всем, что дата изменилась
+        document.dispatchEvent(
+          new CustomEvent("calendar:date-changed", {
+            detail: {
+              date,
+              dateString: state.getSelectedDateString(),
+            },
+          })
+        );
+
         this.render();
         return;
       }
 
+      // 👉 Навигация (prev / next / today / first)
       this.handleNav(btn.dataset.action);
     });
   }
@@ -178,7 +192,18 @@ export default class Calendar {
         break;
     }
 
-    console.log("Selected date:", state.getSelectedDate());
+    console.log("📅 Навигация календаря, новая дата:", state.getSelectedDate());
+
+    // 🔔 то же событие — единый контракт
+    document.dispatchEvent(
+      new CustomEvent("calendar:date-changed", {
+        detail: {
+          date: state.getSelectedDate(),
+          dateString: state.getSelectedDateString(),
+        },
+      })
+    );
+
     this.render();
   }
 }

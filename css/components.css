@@ -160,24 +160,340 @@ textarea {
   color: var(--purple-600);
 }
 
-/* ================= ADD EVENT BUTTON ================= */
+/* ================= ADD EVENT CARD ================= */
 
-.add-event-btn {
-  border: none;
+.add-event-card {
+  border: 2px dashed var(--gray-300);
   border-radius: var(--radius-md);
-  padding: 14px;
-  font-size: 15px;
-  font-weight: 500;
-
-  background: linear-gradient(135deg, var(--blue-500), var(--purple-500));
-  color: #ffffff;
-
+  background: #ffffff;
+  padding: 18px;
   cursor: pointer;
-  transition: var(--transition-base);
+  border: 2px dashed var(--purple-500);
+  transition: transform 0.25s ease, background 0.25s ease;
 }
 
-.add-event-btn:hover {
-  transform: scale(1.03);
+.add-event-card:hover {
+  background: var(--pink-700);
+  transform: scale(1.02);
+}
+
+.add-event-inner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  justify-content: center;
+
+  transition: transform 0.25s ease;
+}
+
+.add-event-card:hover .add-event-inner {
+  transform: scale(1.08);
+}
+
+/* === ICON (как add-reminder-btn, но всегда активный) === */
+
+.add-event-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    var(--purple-500),
+    var(--pink-500)
+  ); /* тот же фон что hover */
+  color: var(--purple-600);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 600;
+
+  transition: transform 0.25s ease;
+}
+
+.add-event-card:hover .add-event-icon {
+  transform: scale(1.15);
+}
+
+.add-event-icon svg {
+  color: white;
+  width: 20px;
+  height: 20px;
+}
+
+/* === TEXT === */
+
+.add-event-text {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--gray-800);
+  transition: color 0.25s ease;
+}
+
+.add-event-card:hover .add-event-text {
+  color: var(--purple-600);
+}
+
+/* ================= EVENT TYPE / LOCATION ================= */
+
+.event-type-grid,
+.location-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.location-grid {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.event-type-card,
+.location-card {
+  border: 1.9px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  background: #fff;
+  padding: 5px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition-fast);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 15px;
+  color: var(--gray-500);
+}
+
+.event-type-card svg {
+  margin-top: 10px;
+  width: 30px;
+  height: 30px;
+  color: currentColor;
+}
+.location-card svg {
+  width: 25px;
+  height: 25px;
+  color: currentColor;
+  margin-top: 10px;
+}
+
+.event-type-card {
+  font-size: 29px;
+}
+
+.event-type-card span {
+  font-size: 14px;
+}
+/* placeholder — светло-серый */
+textarea::placeholder {
+  color: var(--gray-400);
+}
+/* ACTIVE STATE */
+.event-type-card.active {
+  border-color: var(--purple-500);
+  background: rgba(124, 58, 237, 0.08);
+  color: var(--purple-600);
+}
+
+.location-card.active {
+  border-color: var(--purple-600);
+  background: rgba(124, 58, 237, 0.08);
+  color: var(--purple-600);
+}
+
+/* hover */
+.event-type-card:hover:not(.active),
+.location-card:hover:not(.active) {
+  border: 1.9px solid var(--gray-400);
+}
+
+/* ================= EVENTS LIST ================= */
+
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* item */
+
+.event-item {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 14px;
+  padding: 14px;
+  border-radius: var(--radius-md);
+  background: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+/* icon */
+
+.event-icon svg {
+  width: 40px;
+  height: 40px;
+}
+
+/* content */
+
+.event-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.event-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.event-row.secondary {
+  color: var(--gray-500);
+  font-size: 13px;
+}
+
+/* time */
+
+.event-time {
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+/* location */
+
+.event-location-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.event-location-text {
+  font-size: 13px;
+  color: var(--gray-600);
+}
+
+/* comment */
+
+.event-comment {
+  line-height: 1.35;
+}
+
+/* empty */
+
+.event-empty {
+  padding: 18px;
+  text-align: center;
+  color: var(--gray-400);
+}
+/* ================= EVENT ITEM ================= */
+
+.event-item {
+  opacity: 0;
+  animation-name: event-in;
+  animation-duration: 0.18s;
+  animation-fill-mode: forwards;
+  animation-timing-function: ease-out;
+}
+.events-empty {
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  opacity: 0.6;
+  margin-bottom: 25px;
+}
+.events-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.events-header {
+  margin-bottom: 16px;
+}
+
+.events-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.events-empty-icon svg {
+  width: 40px;
+  height: 40px;
+}
+.events-empty-icon {
+  font-size: 50px;
+}
+.event-item {
+  position: relative;
+  opacity: 0;
+  transform: translateX(-14px);
+  animation: event-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes event-in {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* icon */
+
+/* SMALL META ICONS */
+
+.event-icon-meta {
+  width: 18px;
+  height: 18px;
+  color: var(--gray-500); /* тот же серый что у текста */
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 14px;
+}
+.event-location,
+.event-comment {
+  color: var(--gray-500);
+  font-size: 0.92em;
+}
+.event-icon-meta svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* content */
+
+.event-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.event-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.event-time {
+  font-size: 14px;
+  font-weight: 600;
 }
 
 /* ================= REMINDERS ================= */
@@ -216,6 +532,89 @@ textarea {
   background: rgba(124, 58, 237, 0.12); /* фиолетовый hover */
   transform: scale(1.15);
 }
+/* ===== EVENTS ICON SIZE ===== */
+
+.event-location svg,
+.event-comment svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 1.8;
+}
+
+/* контейнер иконки */
+.event-icon {
+  min-width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* BIG MAIN EVENT ICON */
+
+.event-icon-main {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 26px; /* 💥 визуально на 2 строки */
+}
+
+.event-icon-main svg {
+  width: 26px;
+  height: 26px;
+}
+/* TIME */
+
+.event-time {
+  font-size: 15px;
+  font-weight: 700; /* 💥 жирно */
+}
+
+/* MAIN ROW */
+
+.event-row-main {
+  gap: 12px;
+}
+
+/* LOCATION */
+
+.event-location,
+.event-comment {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+}
+.reminder-item.reminder-soon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  animation: blink 1s infinite alternate;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+@keyframes blink {
+  0% {
+    border: 1.6px solid var(--pink-500);
+  }
+  50% {
+    border: 1.6px solid var(--pink-700);
+  }
+  100% {
+    border: 1.6px solid var(--pink-700);
+  }
+}
+
+/* COMMENT */
+
+.event-row-secondary {
+  gap: 2px;
+}
+
 /* ================= REMINDER ITEM ================= */
 
 .reminder-item {
@@ -229,6 +628,7 @@ textarea {
   transition: transform 0.25s ease, opacity 0.25s ease;
   margin-bottom: 10px;
   position: relative; /* 🔥 НУЖНО для крестика */
+  overflow: hidden;
 }
 
 /* icon */
@@ -296,10 +696,15 @@ textarea {
 .reminder-item {
   opacity: 0;
   transform: translateX(-12px);
-  animation: reminder-in 0.35s ease forwards;
+  animation: reminder-in 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes reminder-in {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -353,6 +758,56 @@ textarea {
   to {
     opacity: 0;
     transform: translateX(-18px); /* 👈 уходит ВЛЕВО */
+  }
+}
+/* ================= EVENT DELETE ================= */
+
+.event-delete {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+
+  border: none;
+  background: transparent;
+  color: var(--gray-500);
+  font-size: 12px;
+  line-height: 1;
+
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.event-delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  transform: scale(1.1);
+}
+
+/* 🔴 удаление эвента — 1 в 1 как reminder */
+
+.event-item.removing {
+  animation: event-out 0.28s ease forwards;
+  border-left-color: #ef4444;
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.15),
+    rgba(239, 68, 68, 0.05)
+  );
+}
+
+@keyframes event-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(-18px);
   }
 }
 

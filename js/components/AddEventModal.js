@@ -1,5 +1,6 @@
 import Modal from "../ui/Modal.js";
 import state from "../core/State.js";
+import Constants from "../core/Constants.js";
 
 export default class AddEventModal {
   constructor(onSave) {
@@ -8,60 +9,166 @@ export default class AddEventModal {
   }
 
   open() {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, "0");
+    const mm = String(now.getMinutes()).padStart(2, "0");
+
     this.modal.open(`
-      <div class="modal-header"><h2>Add Event</h2></div>
-      <form class="modal-body" id="event-form">
-        <div class="event-types">
-          <button type="button" class="event-type selected" data-type="pee">💧 Pee</button>
-          <button type="button" class="event-type" data-type="poop">💩 Poop</button>
-          <button type="button" class="event-type" data-type="eat">🍴 Eat</button>
+      <div class="modal-window">
+
+        <!-- HEADER -->
+        <div class="modal-header">
+          <h2>Add Event</h2>
+          <button class="modal-close" data-action="close">✕</button>
         </div>
 
-        <input type="time" name="time" required />
-        <input type="text" name="location" placeholder="Location (optional)" />
-        <textarea name="comment" placeholder="Comment (optional)"></textarea>
+        <!-- BODY -->
+        <div class="modal-body">
 
-        <div class="modal-actions">
-          <button type="submit">Save</button>
-          <button type="button" id="cancel">Cancel</button>
+          <h4>Event Type</h4>
+          <div class="event-type-grid">
+            ${["pee", "poop", "eat"]
+              .map(
+                (type) => `
+              <div class="event-type-card ${
+                type === "pee" ? "active" : ""
+              }" data-type="${type}">
+                ${Constants.EVENT_ICONS[type]}
+                <span>${type}</span>
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+
+          <h4>Time</h4>
+          <div class="input-group">
+            <span class="input-icon">${Constants.ICONS.CLOCK}</span>
+            <input type="time" id="event-time" value="${hh}:${mm}" />
+          </div>
+
+          <h4>Location</h4>
+          <div class="location-grid">
+            <div class="location-card active" data-location="home">
+              ${Constants.EVENT_ICONS.HOME}
+              <span>Home</span>
+            </div>
+            <div class="location-card" data-location="street">
+              ${Constants.EVENT_ICONS.STREET}
+              <span>Street</span>
+            </div>
+          </div>
+
+          <h4>Comment (optional)</h4>
+          <div class="input-group">
+            <span class="input-icon">${Constants.ICONS.NOTE}</span>
+            <textarea
+              id="event-comment"
+              placeholder="Add a note..."
+              rows="3"
+            ></textarea>
+          </div>
+
         </div>
-      </form>
+
+        <!-- FOOTER -->
+        <div class="modal-footer">
+          <button class="btn-secondary" data-action="cancel">Cancel</button>
+          <button class="btn-primary" id="save-event">Save Event</button>
+        </div>
+
+      </div>
     `);
 
     this.bind();
+    this.applyEventColors("pee");
   }
 
   bind() {
-    const form = document.getElementById("event-form");
     let type = "pee";
+    let location = "home";
 
-    form.querySelectorAll(".event-type").forEach((btn) => {
-      btn.onclick = () => {
-        form
-          .querySelectorAll(".event-type")
-          .forEach((b) => b.classList.remove("selected"));
-        btn.classList.add("selected");
-        type = btn.dataset.type;
+    // EVENT TYPE
+    document.querySelectorAll(".event-type-card").forEach((card) => {
+      card.onclick = () => {
+        document
+          .querySelectorAll(".event-type-card")
+          .forEach((c) => c.classList.remove("active"));
+        card.classList.add("active");
+        type = card.dataset.type;
+        this.applyEventColors(type);
       };
     });
 
-    document.getElementById("cancel").onclick = () => this.modal.close();
+    // LOCATION
+    document.querySelectorAll(".location-card").forEach((card) => {
+      card.onclick = () => {
+        document
+          .querySelectorAll(".location-card")
+          .forEach((c) => c.classList.remove("active"));
+        card.classList.add("active");
+        location = card.dataset.location;
+      };
+    });
 
-    form.onsubmit = (e) => {
-      e.preventDefault();
-      const data = new FormData(form);
+    // CLOSE
+    document
+      .querySelectorAll("[data-action='close'], [data-action='cancel']")
+      .forEach((btn) => (btn.onclick = () => this.modal.close()));
 
-      state.addEvent({
-        id: Date.now(),
+    // SAVE
+    document.getElementById("save-event").onclick = async () => {
+      // ✅ ВАЖНО: берём дату из календаря
+      const date = state.getSelectedDateString();
+
+      const payload = {
+        date, // 👈 ВОТ ЭТА СТРОКА
         type,
-        time: data.get("time"),
-        location: data.get("location"),
-        comment: data.get("comment"),
-        date: state.getSelectedDateString(),
-      });
+        location,
+        time: document.getElementById("event-time").value,
+        comment: document.getElementById("event-comment").value.trim(),
+      };
 
-      this.onSave();
+      console.log("📦 EVENT JSON:", payload);
+
+      try {
+        const res = await fetch("/api/events-create.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        const json = await res.json();
+        console.log("✅ EVENT SAVED:", json);
+
+        if (!json.success) {
+          console.error("❌ Save failed", json);
+          return;
+        }
+      } catch (err) {
+        console.error("❌ Request error", err);
+        return;
+      }
+
+      if (this.onSave) this.onSave();
       this.modal.close();
     };
+  }
+
+  applyEventColors(type) {
+    const colors = Constants.EVENT_COLORS[type];
+    if (!colors) return;
+
+    document.querySelectorAll(".event-type-card").forEach((card) => {
+      if (card.dataset.type === type) {
+        card.style.borderColor = colors.border;
+        card.style.background = colors.bg;
+        card.style.color = colors.title;
+      } else {
+        card.style.borderColor = "";
+        card.style.background = "";
+        card.style.color = "";
+      }
+    });
   }
 }
