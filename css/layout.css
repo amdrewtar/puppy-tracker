@@ -102,7 +102,7 @@
 .stats-button {
   border: none;
   padding: 8px 14px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   background: linear-gradient(135deg, var(--purple-500), var(--pink-500));
   color: #ffffff;
   font-weight: 500;

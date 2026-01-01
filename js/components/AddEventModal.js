@@ -3,9 +3,10 @@ import state from "../core/State.js";
 import Constants from "../core/Constants.js";
 
 export default class AddEventModal {
-  constructor(onSave) {
+  constructor(onSave, event = null) {
     this.modal = new Modal();
     this.onSave = onSave;
+    this.event = event; // null = create, object = edit
   }
 
   open() {
@@ -13,12 +14,15 @@ export default class AddEventModal {
     const hh = String(now.getHours()).padStart(2, "0");
     const mm = String(now.getMinutes()).padStart(2, "0");
 
+    const isEdit = !!this.event;
+    const hhmm = isEdit ? this.event.time : `${hh}:${mm}`;
+
     this.modal.open(`
       <div class="modal-window">
 
         <!-- HEADER -->
         <div class="modal-header">
-          <h2>Add Event</h2>
+          <h2>${isEdit ? "Edit Event" : "Add Event"}</h2>
           <button class="modal-close" data-action="close">✕</button>
         </div>
 
@@ -30,9 +34,7 @@ export default class AddEventModal {
             ${["pee", "poop", "eat"]
               .map(
                 (type) => `
-              <div class="event-type-card ${
-                type === "pee" ? "active" : ""
-              }" data-type="${type}">
+              <div class="event-type-card" data-type="${type}">
                 ${Constants.EVENT_ICONS[type]}
                 <span>${type}</span>
               </div>
@@ -44,14 +46,14 @@ export default class AddEventModal {
           <h4>Time</h4>
           <div class="input-group">
             <span class="input-icon">${Constants.ICONS.CLOCK}</span>
-            <input type="time" id="event-time" value="${hh}:${mm}" />
+            <input type="time" id="event-time" value="${hhmm}" />
           </div>
 
-          <!-- 🔽 LOCATION -->
+          <!-- LOCATION -->
           <div id="event-location-block">
             <h4>Location</h4>
             <div class="location-grid">
-              <div class="location-card active" data-location="home">
+              <div class="location-card" data-location="home">
                 ${Constants.EVENT_ICONS.HOME}
                 <span>Home</span>
               </div>
@@ -62,7 +64,7 @@ export default class AddEventModal {
             </div>
           </div>
 
-          <!-- 🥣 FOOD AMOUNT -->
+          <!-- FOOD -->
           <div id="event-grams-block" style="display:none">
             <h4>Food amount</h4>
             <div class="input-group">
@@ -91,25 +93,32 @@ export default class AddEventModal {
         <!-- FOOTER -->
         <div class="modal-footer">
           <button class="btn-secondary" data-action="cancel">Cancel</button>
-          <button class="btn-primary" id="save-event">Save Event</button>
+          <button class="btn-primary" id="save-event">
+            ${isEdit ? "Save Changes" : "Save Event"}
+          </button>
         </div>
 
       </div>
     `);
 
     this.bind();
+
+    // init default
     this.applyEventColors("pee");
     this.toggleLocationVisibility("pee");
-    this.toggleGramsVisibility("pee"); // 👈 ИНИЦИАЛИЗАЦИЯ
+    this.toggleGramsVisibility("pee");
+
+    // fill data if edit
+    if (this.event) {
+      this.fillForm();
+    }
   }
 
   bind() {
-    let type = "pee";
-    let location = "home";
+    let type = this.event?.type || "pee";
+    let location = this.event?.location || "home";
 
-    // =====================================================
     // EVENT TYPE
-    // =====================================================
     document.querySelectorAll(".event-type-card").forEach((card) => {
       card.onclick = () => {
         document
@@ -125,9 +134,7 @@ export default class AddEventModal {
       };
     });
 
-    // =====================================================
     // LOCATION
-    // =====================================================
     document.querySelectorAll(".location-card").forEach((card) => {
       card.onclick = () => {
         document
@@ -144,36 +151,31 @@ export default class AddEventModal {
       .querySelectorAll("[data-action='close'], [data-action='cancel']")
       .forEach((btn) => (btn.onclick = () => this.modal.close()));
 
-    // =====================================================
     // SAVE
-    // =====================================================
     document.getElementById("save-event").onclick = async () => {
-      const date = state.getSelectedDateString();
-
       const payload = {
-        date,
+        id: this.event?.id,
+        date: state.getSelectedDateString(),
         type,
         time: document.getElementById("event-time").value,
         comment: document.getElementById("event-comment").value.trim(),
       };
 
-      // 👉 location только если НЕ eat
       if (type !== "eat") {
         payload.location = location;
       }
 
-      // 👉 grams только если eat
       if (type === "eat") {
         const grams = document.getElementById("event-grams").value;
-        if (grams) {
-          payload.grams = parseInt(grams, 10);
-        }
+        if (grams) payload.grams = parseInt(grams, 10);
       }
 
-      console.log("📦 EVENT JSON:", payload);
+      const url = this.event
+        ? "/api/events-update.php"
+        : "/api/events-create.php";
 
       try {
-        const res = await fetch("/api/events-create.php", {
+        const res = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -194,21 +196,34 @@ export default class AddEventModal {
     };
   }
 
-  // =====================================================
-  // VISIBILITY
-  // =====================================================
+  fillForm() {
+    const e = this.event;
+
+    document.querySelector(`.event-type-card[data-type="${e.type}"]`)?.click();
+
+    if (e.location) {
+      document
+        .querySelector(`.location-card[data-location="${e.location}"]`)
+        ?.click();
+    }
+
+    if (e.grams) {
+      const grams = document.getElementById("event-grams");
+      if (grams) grams.value = e.grams;
+    }
+
+    const comment = document.getElementById("event-comment");
+    if (comment) comment.value = e.comment || "";
+  }
+
   toggleLocationVisibility(type) {
     const block = document.getElementById("event-location-block");
-    if (!block) return;
-
-    block.style.display = type === "eat" ? "none" : "";
+    if (block) block.style.display = type === "eat" ? "none" : "";
   }
 
   toggleGramsVisibility(type) {
     const block = document.getElementById("event-grams-block");
-    if (!block) return;
-
-    block.style.display = type === "eat" ? "" : "none";
+    if (block) block.style.display = type === "eat" ? "" : "none";
   }
 
   applyEventColors(type) {
@@ -217,10 +232,12 @@ export default class AddEventModal {
 
     document.querySelectorAll(".event-type-card").forEach((card) => {
       if (card.dataset.type === type) {
+        card.classList.add("active");
         card.style.borderColor = colors.border;
         card.style.background = colors.bg;
         card.style.color = colors.title;
       } else {
+        card.classList.remove("active");
         card.style.borderColor = "";
         card.style.background = "";
         card.style.color = "";

@@ -24,6 +24,8 @@ export default class RemindersPanel {
         return aDate - bDate;
       });
 
+    this.currentReminders = reminders;
+
     this.root.innerHTML = `
       <div class="card reminders-card">
         <div class="reminders-header">
@@ -52,44 +54,77 @@ export default class RemindersPanel {
   }
 
   // =====================================================
-  // ⏱️ LIVE UPDATE
+  // ITEM
   // =====================================================
-  startLiveUpdate() {
-    if (this._liveTimer) return; // ❗ защита от дублей
+  renderItem(reminder, index) {
+    const showTime =
+      reminder.time && reminder.time !== "00:00"
+        ? `<span class="meta-item">${Constants.ICONS.CLOCK} ${reminder.time}</span>`
+        : "";
 
-    this._liveTimer = setInterval(() => {
-      const now = new Date();
+    const showComment = reminder.comment
+      ? `<div class="meta-item">${Constants.ICONS.NOTE} ${reminder.comment}</div>`
+      : "";
 
-      const items = this.root.querySelectorAll(".reminder-item:not(.empty)");
+    return `
+      <div
+        class="reminder-item"
+        data-id="${reminder.id}"
+        data-date="${reminder.date}"
+        data-time="${reminder.time || ""}"
+        style="animation-delay:${index * 0.08}s"
+      >
 
-      items.forEach((item) => {
-        const date = item.dataset.date;
-        const time = item.dataset.time;
+        <!-- ACTIONS (НЕ МЕНЯЕМ КЛАССЫ) -->
+        <div class="event-actions">
+          <button
+            class="event-edit"
+            data-action="edit"
+            title="Edit reminder"
+          >
+            ${Constants.ICONS.EDIT}
+          </button>
 
-        if (!date || !time) return;
+          <button
+            class="event-delete"
+            data-action="delete"
+            title="Delete reminder"
+          >
+            ${Constants.ICONS.DELETE}
+          </button>
+        </div>
 
-        const reminderDate = new Date(`${date} ${time}`);
-        const diffMs = reminderDate - now;
-        const diffMin = diffMs / 60000;
+        <div class="reminder-icon">${Constants.ICONS.REMINDER}</div>
 
-        // ❌ ПРОШЛО + 1 МИНУТА — УДАЛЯЕМ
-        if (diffMs <= -60_000) {
-          this.removeReminderItem(item);
-          return;
-        }
+        <div class="reminder-content">
+          <div class="reminder-title"><strong>${reminder.title}</strong></div>
 
-        // ⚠️ МЕНЬШЕ 5 МИНУТ — МИГАЕМ ПОСТОЯННО
-        if (diffMin <= 5) {
-          item.classList.add("reminder-soon");
-        } else {
-          item.classList.remove("reminder-soon");
-        }
-      });
-    }, 1_000); // 🔁 каждые 10 сек (можно 5)
+          <div class="reminder-meta">
+            <span class="meta-item">
+              ${Constants.ICONS.CALENDAR} ${reminder.dateLabel}
+            </span>
+            ${showTime}
+          </div>
+
+          <div class="reminder-meta">${showComment}</div>
+        </div>
+      </div>
+    `;
+  }
+
+  renderEmptyItem() {
+    return `
+      <div class="reminder-item empty">
+        <div class="reminder-icon">${Constants.ICONS.NONE}</div>
+        <div class="reminder-content" style="margin: auto 10px; font-size: 15px;">
+          <span class="reminder-meta">Нет ближайших событий</span>
+        </div>
+      </div>
+    `;
   }
 
   // =====================================================
-  // ❌ REMOVE
+  // ❌ REMOVE (НЕ ТРОГАЕМ)
   // =====================================================
   async removeReminderItem(item) {
     if (item.classList.contains("removing")) return;
@@ -126,108 +161,43 @@ export default class RemindersPanel {
   }
 
   // =====================================================
-  // ITEM
-  // =====================================================
-  renderItem(reminder, index) {
-    const showTime =
-      reminder.time && reminder.time !== "00:00"
-        ? `<span class="meta-item">${Constants.ICONS.CLOCK} ${reminder.time}</span>`
-        : "";
-
-    const showComment = reminder.comment
-      ? `<div class="meta-item">${Constants.ICONS.NOTE} ${reminder.comment}</div>`
-      : "";
-
-    return `
-      <div
-        class="reminder-item"
-        data-id="${reminder.id}"
-        data-date="${reminder.date}"
-        data-time="${reminder.time || ""}"
-        style="animation-delay:${index * 0.08}s"
-      >
-        <button class="reminder-delete" data-action="delete">✕</button>
-
-        <div class="reminder-icon">${Constants.ICONS.REMINDER}</div>
-
-        <div class="reminder-content">
-          <div class="reminder-title"><strong>${reminder.title}</strong></div>
-
-          <div class="reminder-meta">
-            <span class="meta-item">
-              ${Constants.ICONS.CALENDAR} ${reminder.dateLabel}ф
-            </span>
-            ${showTime}
-          </div>
-
-          <div class="reminder-meta">${showComment}</div>
-        </div>
-      </div>
-    `;
-  }
-
-  renderEmptyItem() {
-    return `
-      <div class="reminder-item empty">
-        <div class="reminder-icon">${Constants.ICONS.NONE}</div>
-        <div class="reminder-content" style="margin: auto 10px; font-size: 15px;">
-          <span class="reminder-meta">Нет ближайших событий</span>
-        </div>
-      </div>
-    `;
-  }
-
-  // =====================================================
-  // ➕ ADD (СОРТИРОВКА + 5 МИН)
-  // =====================================================
-  addReminder(reminder) {
-    const list = this.root.querySelector(".reminders-list");
-    if (!list) return;
-
-    const empty = list.querySelector(".empty");
-    if (empty) empty.remove();
-
-    const node = this.createNode(reminder);
-
-    const reminderDate = new Date(
-      `${reminder.date} ${reminder.time || "00:00"}`
-    );
-
-    const items = [...list.querySelectorAll(".reminder-item")];
-
-    const before = items.find((el) => {
-      const d = new Date(`${el.dataset.date} ${el.dataset.time || "00:00"}`);
-      return reminderDate < d;
-    });
-
-    before ? list.insertBefore(node, before) : list.appendChild(node);
-
-    // 🔥 СРАЗУ проверить 5 минут
-    const diffMin = (reminderDate - new Date()) / 60000;
-    if (diffMin <= 5 && diffMin > 0) {
-      node.classList.add("reminder-soon");
-    }
-  }
-
-  createNode(reminder) {
-    const wrap = document.createElement("div");
-    wrap.innerHTML = this.renderItem(reminder, 0);
-    return wrap.firstElementChild;
-  }
-
-  // =====================================================
   // EVENTS
   // =====================================================
   bind() {
     const addBtn = this.root.querySelector("#add-reminder-btn");
 
     this.root.onclick = (e) => {
-      const btn = e.target.closest("[data-action='delete']");
-      if (!btn) return;
-      const item = btn.closest(".reminder-item");
-      if (item) this.removeReminderItem(item);
+      // ===== DELETE =====
+      const deleteBtn = e.target.closest("[data-action='delete']");
+      if (deleteBtn) {
+        const item = deleteBtn.closest(".reminder-item");
+        if (item) this.removeReminderItem(item);
+        return;
+      }
+
+      // ===== EDIT =====
+      const editBtn = e.target.closest("[data-action='edit']");
+      if (editBtn) {
+        const item = editBtn.closest(".reminder-item");
+        if (!item) return;
+
+        const id = item.dataset.id;
+        const reminder = this.currentReminders.find((r) => r.id == id);
+        if (!reminder) return;
+
+        // 🔥 ТО ЖЕ МОДАЛЬНОЕ ОКНО, НО С ДАННЫМИ
+        new AddReminderModal(
+          (updatedReminder) => {
+            Object.assign(reminder, updatedReminder);
+            reminder.dateLabel = new Date(reminder.date).toLocaleDateString();
+            this.render();
+          },
+          reminder // ← передаём ВСЕ поля
+        ).open();
+      }
     };
 
+    // ===== ADD =====
     addBtn.onclick = () => {
       new AddReminderModal((newReminder) => {
         if (!newReminder.date) {
@@ -237,8 +207,51 @@ export default class RemindersPanel {
         newReminder.dateLabel = new Date(newReminder.date).toLocaleDateString();
 
         state.reminders.push(newReminder);
-        this.addReminder(newReminder);
+        this.render();
       }).open();
     };
+  }
+
+  // =====================================================
+  // ⏱️ LIVE UPDATE (НЕ ТРОГАЕМ)
+  // =====================================================
+  startLiveUpdate() {
+    if (this._liveTimer) return;
+
+    this._liveTimer = setInterval(() => {
+      const now = new Date();
+      const items = this.root.querySelectorAll(".reminder-item:not(.empty)");
+
+      items.forEach((item) => {
+        const date = item.dataset.date;
+        const time = item.dataset.time;
+        if (!date || !time) return;
+
+        let reminderDate;
+
+        if (time === "00:00") {
+          // ⏰ ALL-DAY POINT
+          // удаляется в 00:00 следующего дня
+          reminderDate = new Date(`${date} 00:00`);
+          reminderDate.setDate(reminderDate.getDate() + 1);
+        } else {
+          // ⏱️ обычное напоминание
+          reminderDate = new Date(`${date} ${time}`);
+        }
+        const diffMs = reminderDate - now;
+        const diffMin = diffMs / 60000;
+
+        if (diffMs <= -60_000) {
+          this.removeReminderItem(item);
+          return;
+        }
+
+        if (diffMin <= 5) {
+          item.classList.add("reminder-soon");
+        } else {
+          item.classList.remove("reminder-soon");
+        }
+      });
+    }, 1000);
   }
 }

@@ -2,13 +2,15 @@ import Modal from "../ui/Modal.js";
 import Constants from "../core/Constants.js";
 
 export default class AddReminderModal {
-  constructor(onSave) {
+  constructor(onSave, reminder = null) {
     this.modal = new Modal();
     this.onSave = onSave;
-    this.lastReminder = null;
+    this.reminder = reminder; // 👈 если есть — edit mode
   }
 
   open() {
+    const isEdit = !!this.reminder;
+
     this.modal.open(`
       <div class="modal-window">
 
@@ -16,7 +18,7 @@ export default class AddReminderModal {
         <div class="modal-header">
           <div class="modal-header-content">
             <div class="modal-icon">${Constants.ICONS.REMINDER}</div>
-            <h2>Add Reminder</h2>
+            <h2>${isEdit ? "Edit Reminder" : "Add Reminder"}</h2>
           </div>
           <button class="modal-close" data-action="close">✕</button>
         </div>
@@ -71,7 +73,7 @@ export default class AddReminderModal {
           </button>
 
           <button class="btn-primary" id="save-reminder" disabled>
-            Save Reminder
+            ${isEdit ? "Save Changes" : "Save Reminder"}
           </button>
         </div>
 
@@ -88,8 +90,26 @@ export default class AddReminderModal {
     const noteInput = document.getElementById("reminder-note");
     const saveBtn = document.getElementById("save-reminder");
 
-    // today by default
-    dateInput.valueAsDate = new Date();
+    const isEdit = !!this.reminder;
+
+    // ===============================
+    // PREFILL (EDIT MODE)
+    // ===============================
+    if (isEdit) {
+      titleInput.value = this.reminder.title || "";
+      dateInput.value = this.reminder.date || "";
+      timeInput.value = this.reminder.time || "00:00";
+      noteInput.value = this.reminder.comment || this.reminder.note || "";
+
+      saveBtn.disabled = false;
+
+      document
+        .querySelectorAll(".quick-select button")
+        .forEach((b) => b.classList.remove("active"));
+    } else {
+      // today by default
+      dateInput.valueAsDate = new Date();
+    }
 
     const validate = () => {
       saveBtn.disabled = !titleInput.value.trim() || !dateInput.value;
@@ -98,7 +118,9 @@ export default class AddReminderModal {
     titleInput.addEventListener("input", validate);
     dateInput.addEventListener("change", validate);
 
-    // quick select
+    // ===============================
+    // QUICK SELECT
+    // ===============================
     document.querySelectorAll(".quick-select button").forEach((btn) => {
       btn.onclick = () => {
         document
@@ -121,37 +143,39 @@ export default class AddReminderModal {
         .forEach((b) => b.classList.remove("active"));
     });
 
-    // close / cancel
+    // ===============================
+    // CLOSE / CANCEL
+    // ===============================
     document
       .querySelectorAll("[data-action='close'], [data-action='cancel']")
       .forEach((btn) => {
         btn.onclick = () => this.modal.close();
       });
 
+    // ===============================
     // SAVE
+    // ===============================
     saveBtn.onclick = async () => {
       const reminder = {
-        id: Date.now().toString(),
+        id: isEdit ? this.reminder.id : Date.now().toString(),
         title: titleInput.value.trim(),
         date: dateInput.value,
-        time: timeInput.value || "00:00",
-        note: noteInput.value.trim(), // ✅ ВАЖНО
-        createdAt: new Date().toISOString(),
+        time: timeInput.value || "23:59",
+        note: noteInput.value.trim(),
       };
 
-      this.lastReminder = reminder;
-      console.log("🧾 LAST REMINDER JSON:", reminder);
-
-      // 👉 POST в БД
       try {
-        await fetch("/api/reminders-create.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(reminder),
-        });
-        console.log("📥 POST response:", data);
+        await fetch(
+          isEdit ? "/api/reminders-update.php" : "/api/reminders-create.php",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(reminder),
+          }
+        );
       } catch (err) {
-        console.error("❌ DB save error", err);
+        console.error("❌ Reminder save error", err);
+        return;
       }
 
       if (this.onSave) {

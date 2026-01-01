@@ -51,7 +51,7 @@ body {
 
   /* Shadows */
   --shadow-xs: 0 0 3px #98989848;
-  --shadow-sm: 0 3px 4px #98989848;
+  --shadow-sm: 0 2px 4px #98989848;
   --shadow-cal: 0px 2px 4px rgba(0, 0, 0, 0.14);
   --shadow-cal-tod: 0px 2px 5px rgba(0, 0, 0, 0.19);
   --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.08);

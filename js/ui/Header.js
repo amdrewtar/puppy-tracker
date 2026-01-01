@@ -1,5 +1,6 @@
 import Calendar from "../components/Calendar.js";
 import Constants from "../core/Constants.js";
+import HistoryStatsModal from "../components/HistoryStatsModal.js";
 
 export default class Header {
   constructor(container) {
@@ -30,6 +31,16 @@ export default class Header {
     `;
 
     this.initCalendar();
+    this.bindStats(); // ✅ ВОТ ЭТОГО НЕ ХВАТАЛО
+  }
+
+  bindStats() {
+    const btn = this.container.querySelector(".stats-button");
+    if (!btn) return;
+
+    btn.onclick = () => {
+      new HistoryStatsModal().open();
+    };
   }
 
   initCalendar() {

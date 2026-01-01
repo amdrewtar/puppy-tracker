@@ -1,5 +1,6 @@
 import state from "../core/State.js";
 import Constants from "../core/Constants.js";
+import AddEventModal from "./AddEventModal.js";
 
 export default class EventsList {
   constructor(root) {
@@ -25,6 +26,8 @@ export default class EventsList {
       const events = Array.isArray(data) ? data : [];
 
       events.sort((a, b) => (b.time || "").localeCompare(a.time || ""));
+
+      this.currentEvents = events;
 
       this.root.innerHTML = `
         <section class="events-card">
@@ -58,29 +61,39 @@ export default class EventsList {
         data-id="${event.id}"
         style="
           background:${colors.bg};
-          border:1.5px solid ${colors.border};
+          border:1px solid ${colors.border};
           animation-delay:${index * 0.06}s;
         "
       >
 
-        <button
-          class="event-delete"
-          data-action="delete"
-          title="Delete event"
-        >
-          ✕
-        </button>
+        <!-- ACTIONS -->
+        <div class="event-actions">
+          <button
+            class="event-edit"
+            data-action="edit"
+            title="Edit event"
+          >
+            ${Constants.ICONS.EDIT}
+          </button>
 
+          <button
+            class="event-delete"
+            data-action="delete"
+            title="Delete event"
+          >
+            ${Constants.ICONS.DELETE}
+          </button>
+        </div>
+
+        <!-- ICON -->
         <div
           class="event-icon event-icon-main"
-          style="
-            background:#fff;
-            color:${colors.title};
-          "
+          style="background:#fff;color:${colors.title};"
         >
           ${icon}
         </div>
 
+        <!-- CONTENT -->
         <div class="event-content">
 
           <div class="event-row event-row-main">
@@ -137,9 +150,7 @@ export default class EventsList {
   renderEmpty() {
     return `
       <div class="events-empty">
-        <div class="events-empty-icon">
-          🐾
-        </div>
+        <div class="events-empty-icon">🐾</div>
         <p>No events for this day</p>
       </div>
     `;
@@ -147,44 +158,60 @@ export default class EventsList {
 
   bind() {
     this.root.onclick = async (e) => {
+      // ================= DELETE =================
       const deleteBtn = e.target.closest("[data-action='delete']");
-      if (!deleteBtn) return;
+      if (deleteBtn) {
+        e.stopPropagation();
 
-      e.stopPropagation();
+        const item = deleteBtn.closest(".event-item");
+        if (!item) return;
 
-      const item = deleteBtn.closest(".event-item");
-      if (!item) return;
+        const id = item.dataset.id;
+        if (!id) return;
 
-      const id = item.dataset.id;
-      if (!id) return;
+        item.classList.add("removing");
 
-      item.classList.add("removing");
-      item.style.background = "";
-      item.style.border = "";
-      item.style.borderLeft = "";
+        try {
+          await fetch("/api/events-delete.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id }),
+          });
+        } catch (err) {
+          console.error("❌ Event delete failed", err);
+          item.classList.remove("removing");
+          return;
+        }
 
-      try {
-        await fetch("/api/events-delete.php", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id }),
-        });
-      } catch (err) {
-        console.error("❌ Event delete failed", err);
-        item.classList.remove("removing");
+        setTimeout(() => {
+          item.remove();
+
+          const body = this.root.querySelector(".events-body");
+          if (!body.querySelector(".event-item")) {
+            body.innerHTML = this.renderEmpty();
+          }
+        }, 280);
+
         return;
       }
 
-      setTimeout(() => {
-        item.remove();
+      // ================= EDIT =================
+      const editBtn = e.target.closest("[data-action='edit']");
+      if (editBtn) {
+        e.stopPropagation();
 
-        const body = this.root.querySelector(".events-body");
-        const hasItems = body.querySelector(".event-item");
+        const item = editBtn.closest(".event-item");
+        if (!item) return;
 
-        if (!hasItems) {
-          body.innerHTML = this.renderEmpty();
-        }
-      }, 280);
+        const id = item.dataset.id;
+        if (!id) return;
+
+        const event = this.currentEvents.find((e) => e.id == id);
+        if (!event) return;
+
+        const modal = new AddEventModal(() => this.render(), event);
+        modal.open();
+      }
     };
   }
 }
